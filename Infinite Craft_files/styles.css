@@ -1,0 +1,5 @@
+#standard_iab_left1 > div > iframe, 
+#standard_iab_left2 > div > iframe, 
+#standard_iab_rght1 > div > iframe {
+  width: 120px !important;
+}
