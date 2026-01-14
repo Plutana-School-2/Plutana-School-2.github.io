@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SoundCloud Proxy Runner</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; background: #f0f0f0; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #ff5500; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+        #output { margin-top: 20px; white-space: pre-wrap; font-family: monospace; font-size: 12px; background: #eee; padding: 10px; border-radius: 4px; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>SoundCloud Proxy Test</h2>
+        <p>Enter a SoundCloud API path (e.g., <code>/v2/search?q=lofi</code>)</p>
+        <input type="text" id="apiPath" placeholder="/v1/tracks/123 or /v2/search?q=..." value="/sc/v2/search?q=lofi">
+        <button onclick="fetchData()">Run Proxy Request</button>
+        <div id="output">Results will appear here...</div>
+    </div>
+
+    <script>
+        async function fetchData() {
+            const path = document.getElementById('apiPath').value;
+            const output = document.getElementById('output');
+            output.innerText = 'Fetching...';
+            try {
+                const response = await fetch(path);
+                const data = await response.json();
+                output.innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                output.innerText = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
