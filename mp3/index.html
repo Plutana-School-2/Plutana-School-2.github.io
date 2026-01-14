@@ -88,7 +88,7 @@
 
         async function loadFromJSON() {
             try {
-                const r = await fetch('https://raw.githubusercontent.com/Plutana-Workflow/Plutana-Workflow.github.io/refs/heads/main/mp3/S.json');
+                const r = await fetch('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/refs/heads/main/mp3/S.json');
                 const data = await r.json();
                 tracks = [...data.filter(i => i.type?.includes('audio')), ...tracks];
                 render();
