@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Webport Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            background-image: url('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/refs/heads/main/Webports/icons/_108277239_gettyimages-681946576.jpg.png');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            margin-top: 50px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            justify-items: center;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s ease, background 0.3s ease;
+            text-decoration: none;
+            color: white;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .game-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #222;
+        }
+
+        .game-card h3 {
+            margin: 10px 0 5px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Game Webports</h1>
+        <div id="game-grid">
+            <!-- Games will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        async function loadGames() {
+            const grid = document.getElementById('game-grid');
+            try {
+                const response = await fetch('Cg.json');
+                const games = await response.json();
+
+                games.forEach(game => {
+                    const card = document.createElement('a');
+                    card.href = game.link;
+                    card.className = 'game-card';
+                    card.target = '_blank';
+
+                    card.innerHTML = `
+                        <img src="${game.icon}" alt="${game.name}">
+                        <h3>${game.name}</h3>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading Cg.json:', error);
+                grid.innerHTML = '<p>Failed to load games. Make sure Cg.json is in the same directory.</p>';
+            }
+        }
+
+        loadGames();
+    </script>
+</body>
+</html>
