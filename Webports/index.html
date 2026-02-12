@@ -12,7 +12,6 @@
             padding: 0;
             height: 100%;
             background-color: black;
-
             background-image: url('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/refs/heads/main/Webports/icons/_108277239_gettyimages-681946576.jpg.png');
             background-size: cover;
             background-position: center;
@@ -26,7 +25,6 @@
             display: flex;
             height: 100vh;
             width: 100vw;
-
             background: rgba(0, 0, 0, 0.4);
         }
 
@@ -89,6 +87,27 @@
             position: relative;
         }
 
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        #fullscreen-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s;
+        }
+
+        #fullscreen-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         #game-frame {
             width: 100%;
             height: 100%;
@@ -121,11 +140,14 @@
         </div>
 
         <div class="player-container">
+            <div class="controls">
+                <button id="fullscreen-btn">Fullscreen</button>
+            </div>
             <div id="player-placeholder" class="empty-state">
                 <h1>Sup</h1>
                 <p>Select a game</p>
             </div>
-            <iframe id="game-frame" src="" style="display: none;"></iframe>
+            <iframe id="game-frame" src="" style="display: none;" allowfullscreen></iframe>
         </div>
     </div>
 
@@ -133,6 +155,17 @@
         const gameFrame = document.getElementById('game-frame');
         const placeholder = document.getElementById('player-placeholder');
         const listContainer = document.getElementById('game-list');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        fullscreenBtn.onclick = () => {
+            if (gameFrame.requestFullscreen) {
+                gameFrame.requestFullscreen();
+            } else if (gameFrame.webkitRequestFullscreen) {
+                gameFrame.webkitRequestFullscreen();
+            } else if (gameFrame.msRequestFullscreen) {
+                gameFrame.msRequestFullscreen();
+            }
+        };
 
         async function init() {
             try {
@@ -148,9 +181,15 @@
                     `;
                     
                     item.onclick = () => {
+                        gameFrame.src = ""; 
+                        
                         placeholder.style.display = 'none';
                         gameFrame.style.display = 'block';
-                        gameFrame.src = game.link;
+                        fullscreenBtn.style.display = 'block';
+                        
+                        setTimeout(() => {
+                            gameFrame.src = game.link;
+                        }, 10);
                     };
                     listContainer.appendChild(item);
                 });
