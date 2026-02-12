@@ -11,11 +11,9 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            background-color: black;
-            background-image: url('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/refs/heads/main/Webports/icons/_108277239_gettyimages-681946576.jpg.png');
+            /* Fixed background image logic */
+            background: #111 url('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/main/Webports/icons/_108277239_gettyimages-681946576.jpg.png') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             font-family: 'Segoe UI', Tahoma, sans-serif;
             color: white;
             overflow: hidden;
@@ -25,18 +23,19 @@
             display: flex;
             height: 100vh;
             width: 100vw;
-            background: rgba(0, 0, 0, 0.4);
+            /* Semi-transparent overlay to keep text readable without hiding the background */
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .sidebar {
             width: 300px;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.85); /* Slightly transparent */
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             padding: 20px;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             z-index: 10;
         }
 
@@ -44,7 +43,7 @@
             text-align: center;
             margin-bottom: 25px;
             font-weight: 300;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             border-bottom: 1px solid rgba(255,255,255,0.2);
             padding-bottom: 15px;
         }
@@ -59,24 +58,24 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.1);
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .game-item:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(5px);
-            border-color: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(8px);
+            border-color: rgba(255,255,255,0.4);
         }
 
         .game-item img {
             width: 45px;
             height: 45px;
-            border-radius: 6px;
+            border-radius: 8px;
             object-fit: cover;
         }
 
@@ -85,25 +84,24 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: #000;
+            background: transparent; /* Changed from black to show background */
         }
 
-        /* THE TOP TOP RIGHT BUTTON */
         #fullscreen-btn {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 100000; /* Ensure it's above everything */
+            z-index: 100000;
             background: #ff4757;
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 5px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
-            display: none; /* Only show when game is loaded */
+            display: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
         #fullscreen-btn:hover {
@@ -111,7 +109,7 @@
             background: #ff6b81;
         }
 
-        /* Ensure button shows in browser fullscreen mode */
+        /* Essential for button visibility during browser-level fullscreen */
         #player-area:fullscreen #fullscreen-btn {
             display: block;
         }
@@ -120,7 +118,8 @@
             width: 100%;
             height: 100%;
             border: none;
-            background: #000;
+            background: #000; /* Actual game screen is black */
+            border-radius: 0;
         }
 
         .empty-state {
@@ -129,10 +128,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 50px;
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -146,12 +146,11 @@
         </div>
 
         <div class="player-container" id="player-area">
-            <!-- Button is inside the container that goes fullscreen -->
             <button id="fullscreen-btn">GO FULLSCREEN</button>
 
             <div id="player-placeholder" class="empty-state">
-                <h1>Sup</h1>
-                <p>Select a game</p>
+                <h1 style="font-size: 3rem; margin-bottom: 10px;">Sup</h1>
+                <p style="opacity: 0.8;">Select a game to start playing</p>
             </div>
             <iframe id="game-frame" src="" style="display: none;" allowfullscreen></iframe>
         </div>
@@ -167,18 +166,17 @@
         fullscreenBtn.onclick = () => {
             if (!document.fullscreenElement) {
                 playerArea.requestFullscreen().catch(err => {
-                    alert(`Error attempting to enable full-screen mode: ${err.message}`);
+                    console.error(err);
                 });
             } else {
                 document.exitFullscreen();
             }
         };
 
-        // Update button text based on state
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
                 fullscreenBtn.textContent = 'EXIT FULLSCREEN';
-                fullscreenBtn.style.background = '#2f3542'; // Darker when in fullscreen
+                fullscreenBtn.style.background = '#2f3542';
             } else {
                 fullscreenBtn.textContent = 'GO FULLSCREEN';
                 fullscreenBtn.style.background = '#ff4757';
@@ -187,6 +185,7 @@
 
         async function init() {
             try {
+                // Ensure Cg.json is in the same directory
                 const response = await fetch('Cg.json');
                 const games = await response.json();
 
@@ -199,22 +198,22 @@
                     `;
                     
                     item.onclick = () => {
-                        // UNLOAD: Clear current source immediately
+                        // FORCE UNLOAD
                         gameFrame.src = ""; 
                         
                         placeholder.style.display = 'none';
                         gameFrame.style.display = 'block';
                         fullscreenBtn.style.display = 'block';
                         
-                        // LOAD: Set new source after a tiny buffer
+                        // LOAD NEW
                         setTimeout(() => {
                             gameFrame.src = game.link;
-                        }, 50);
+                        }, 100);
                     };
                     listContainer.appendChild(item);
                 });
             } catch (err) {
-                listContainer.innerHTML = '<p style="padding:20px; color:red;">Error loading Cg.json - make sure the file exists!</p>';
+                listContainer.innerHTML = '<p style="color: #ff4757; text-align: center;">Unable to load Cg.json</p>';
             }
         }
 
