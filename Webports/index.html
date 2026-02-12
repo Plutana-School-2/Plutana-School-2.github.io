@@ -87,25 +87,27 @@
             position: relative;
         }
 
-        .controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
-
+        /* TOP TOP Right Button */
         #fullscreen-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            display: none;
-            transition: background 0.2s;
+            display: none; /* Only show when game is loaded */
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            font-weight: bold;
         }
 
         #fullscreen-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
         #game-frame {
@@ -132,6 +134,9 @@
 </head>
 <body>
 
+    <!-- Fullscreen button moved to top level for absolute positioning -->
+    <button id="fullscreen-btn">Go Fullscreen</button>
+
     <div class="main-layout">
         <div class="sidebar">
             <h2>PlutoPorts</h2>
@@ -139,10 +144,7 @@
             </div>
         </div>
 
-        <div class="player-container">
-            <div class="controls">
-                <button id="fullscreen-btn">Fullscreen</button>
-            </div>
+        <div class="player-container" id="player-area">
             <div id="player-placeholder" class="empty-state">
                 <h1>Sup</h1>
                 <p>Select a game</p>
@@ -153,19 +155,31 @@
 
     <script>
         const gameFrame = document.getElementById('game-frame');
+        const playerArea = document.getElementById('player-area');
         const placeholder = document.getElementById('player-placeholder');
         const listContainer = document.getElementById('game-list');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
 
+        // Toggles Fullscreen mode
         fullscreenBtn.onclick = () => {
-            if (gameFrame.requestFullscreen) {
-                gameFrame.requestFullscreen();
-            } else if (gameFrame.webkitRequestFullscreen) {
-                gameFrame.webkitRequestFullscreen();
-            } else if (gameFrame.msRequestFullscreen) {
-                gameFrame.msRequestFullscreen();
+            if (!document.fullscreenElement) {
+                // We fullscreen the container so the button stays visible inside it
+                playerArea.requestFullscreen().catch(err => {
+                    console.error(`Error: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
             }
         };
+
+        // Listen for fullscreen changes to update button text
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.textContent = 'Exit Fullscreen';
+            } else {
+                fullscreenBtn.textContent = 'Go Fullscreen';
+            }
+        });
 
         async function init() {
             try {
@@ -181,15 +195,17 @@
                     `;
                     
                     item.onclick = () => {
+                        // Clear source to force unload of previous game
                         gameFrame.src = ""; 
                         
                         placeholder.style.display = 'none';
                         gameFrame.style.display = 'block';
                         fullscreenBtn.style.display = 'block';
                         
+                        // Load new game after a tiny delay
                         setTimeout(() => {
                             gameFrame.src = game.link;
-                        }, 10);
+                        }, 50);
                     };
                     listContainer.appendChild(item);
                 });
