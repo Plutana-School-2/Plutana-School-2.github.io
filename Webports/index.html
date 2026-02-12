@@ -11,7 +11,6 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            /* Fixed background image logic */
             background: #111 url('https://raw.githubusercontent.com/Plutana-School-2/Plutana-School-2.github.io/main/Webports/icons/_108277239_gettyimages-681946576.jpg.png') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', Tahoma, sans-serif;
@@ -23,13 +22,12 @@
             display: flex;
             height: 100vh;
             width: 100vw;
-            /* Semi-transparent overlay to keep text readable without hiding the background */
             background: rgba(0, 0, 0, 0.3);
         }
 
         .sidebar {
             width: 300px;
-            background: rgba(0, 0, 0, 0.85); /* Slightly transparent */
+            background: rgba(0, 0, 0, 0.85);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
@@ -84,32 +82,33 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            background: transparent; /* Changed from black to show background */
+            background: transparent;
         }
 
+        /* UPDATED BUTTON STYLE: Transparent, White Outline, White Text */
         #fullscreen-btn {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 100000;
-            background: #ff4757;
+            background: transparent;
             color: white;
-            border: none;
-            padding: 12px 24px;
+            border: 2px solid white;
+            padding: 10px 20px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             display: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         #fullscreen-btn:hover {
-            transform: scale(1.1);
-            background: #ff6b81;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
-        /* Essential for button visibility during browser-level fullscreen */
         #player-area:fullscreen #fullscreen-btn {
             display: block;
         }
@@ -118,8 +117,7 @@
             width: 100%;
             height: 100%;
             border: none;
-            background: #000; /* Actual game screen is black */
-            border-radius: 0;
+            background: #000;
         }
 
         .empty-state {
@@ -146,7 +144,7 @@
         </div>
 
         <div class="player-container" id="player-area">
-            <button id="fullscreen-btn">GO FULLSCREEN</button>
+            <button id="fullscreen-btn">Go Fullscreen</button>
 
             <div id="player-placeholder" class="empty-state">
                 <h1 style="font-size: 3rem; margin-bottom: 10px;">Sup</h1>
@@ -173,19 +171,17 @@
             }
         };
 
+        // Update button text while staying transparent
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
-                fullscreenBtn.textContent = 'EXIT FULLSCREEN';
-                fullscreenBtn.style.background = '#2f3542';
+                fullscreenBtn.textContent = 'Exit Fullscreen';
             } else {
-                fullscreenBtn.textContent = 'GO FULLSCREEN';
-                fullscreenBtn.style.background = '#ff4757';
+                fullscreenBtn.textContent = 'Go Fullscreen';
             }
         });
 
         async function init() {
             try {
-                // Ensure Cg.json is in the same directory
                 const response = await fetch('Cg.json');
                 const games = await response.json();
 
@@ -198,14 +194,14 @@
                     `;
                     
                     item.onclick = () => {
-                        // FORCE UNLOAD
+                        // UNLOAD previous source
                         gameFrame.src = ""; 
                         
                         placeholder.style.display = 'none';
                         gameFrame.style.display = 'block';
                         fullscreenBtn.style.display = 'block';
                         
-                        // LOAD NEW
+                        // LOAD new source
                         setTimeout(() => {
                             gameFrame.src = game.link;
                         }, 100);
@@ -213,7 +209,7 @@
                     listContainer.appendChild(item);
                 });
             } catch (err) {
-                listContainer.innerHTML = '<p style="color: #ff4757; text-align: center;">Unable to load Cg.json</p>';
+                listContainer.innerHTML = '<p style="color: white; text-align: center;">Unable to load Cg.json</p>';
             }
         }
 
