@@ -30,13 +30,14 @@
 
         .sidebar {
             width: 300px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
             padding: 20px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         .sidebar h2 {
@@ -83,31 +84,36 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
             position: relative;
+            background: #000;
         }
 
-        /* TOP TOP Right Button */
+        /* THE TOP TOP RIGHT BUTTON */
         #fullscreen-btn {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 100000; /* Ensure it's above everything */
+            background: #ff4757;
             color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
             cursor: pointer;
             display: none; /* Only show when game is loaded */
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
         }
 
         #fullscreen-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
+            transform: scale(1.1);
+            background: #ff6b81;
+        }
+
+        /* Ensure button shows in browser fullscreen mode */
+        #player-area:fullscreen #fullscreen-btn {
+            display: block;
         }
 
         #game-frame {
@@ -115,8 +121,6 @@
             height: 100%;
             border: none;
             background: #000;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
         }
 
         .empty-state {
@@ -125,7 +129,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             padding: 40px;
             border-radius: 20px;
             backdrop-filter: blur(10px);
@@ -133,9 +137,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Fullscreen button moved to top level for absolute positioning -->
-    <button id="fullscreen-btn">Go Fullscreen</button>
 
     <div class="main-layout">
         <div class="sidebar">
@@ -145,6 +146,9 @@
         </div>
 
         <div class="player-container" id="player-area">
+            <!-- Button is inside the container that goes fullscreen -->
+            <button id="fullscreen-btn">GO FULLSCREEN</button>
+
             <div id="player-placeholder" class="empty-state">
                 <h1>Sup</h1>
                 <p>Select a game</p>
@@ -160,24 +164,24 @@
         const listContainer = document.getElementById('game-list');
         const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-        // Toggles Fullscreen mode
         fullscreenBtn.onclick = () => {
             if (!document.fullscreenElement) {
-                // We fullscreen the container so the button stays visible inside it
                 playerArea.requestFullscreen().catch(err => {
-                    console.error(`Error: ${err.message}`);
+                    alert(`Error attempting to enable full-screen mode: ${err.message}`);
                 });
             } else {
                 document.exitFullscreen();
             }
         };
 
-        // Listen for fullscreen changes to update button text
+        // Update button text based on state
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
-                fullscreenBtn.textContent = 'Exit Fullscreen';
+                fullscreenBtn.textContent = 'EXIT FULLSCREEN';
+                fullscreenBtn.style.background = '#2f3542'; // Darker when in fullscreen
             } else {
-                fullscreenBtn.textContent = 'Go Fullscreen';
+                fullscreenBtn.textContent = 'GO FULLSCREEN';
+                fullscreenBtn.style.background = '#ff4757';
             }
         });
 
@@ -195,14 +199,14 @@
                     `;
                     
                     item.onclick = () => {
-                        // Clear source to force unload of previous game
+                        // UNLOAD: Clear current source immediately
                         gameFrame.src = ""; 
                         
                         placeholder.style.display = 'none';
                         gameFrame.style.display = 'block';
                         fullscreenBtn.style.display = 'block';
                         
-                        // Load new game after a tiny delay
+                        // LOAD: Set new source after a tiny buffer
                         setTimeout(() => {
                             gameFrame.src = game.link;
                         }, 50);
@@ -210,7 +214,7 @@
                     listContainer.appendChild(item);
                 });
             } catch (err) {
-                listContainer.innerHTML = '<p>Error loading Cg.json</p>';
+                listContainer.innerHTML = '<p style="padding:20px; color:red;">Error loading Cg.json - make sure the file exists!</p>';
             }
         }
 
